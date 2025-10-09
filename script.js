@@ -3,22 +3,27 @@
 const input = document.getElementById('add_task');
 const addBtn = document.getElementById('add_btn');
 const taskList = document.getElementById('task_list');
+const charCount = document.getElementById('char_count');
+const MAX_CHARS = 120;
 
 function createTaskElement(text) {
     const li = document.createElement('li');
     li.className = 'flex items-center justify-between bg-white border border-indigo-100 rounded-lg px-4 py-2';
 
     const content = document.createElement('div');
-    content.className = 'flex items-center gap-4 flex-1';
+    // min-w-0 permite que o elemento flex quebre corretamente
+    content.className = 'flex items-center gap-4 flex-1 min-w-0';
 
     const label = document.createElement('span');
     label.textContent = text;
-    label.className = 'text-gray-700 break-words';
+    // overflow-hidden + break-all forçam a quebra em palavras longas e evitam overflow
+    label.className = 'text-gray-700 break-all whitespace-normal overflow-hidden block';
 
     content.appendChild(label);
 
     const actions = document.createElement('div');
-    actions.className = 'flex gap-2 items-center';
+    // flex-shrink-0 evita que os botões encolham e o texto invada sua área
+    actions.className = 'flex gap-2 items-center flex-shrink-0';
 
     const editBtn = document.createElement('button');
     editBtn.textContent = '✏';
@@ -53,7 +58,8 @@ function startEdit(li, label, editBtn) {
     const inputEdit = document.createElement('input');
     inputEdit.type = 'text';
     inputEdit.value = originalText;
-    inputEdit.className = 'border rounded px-2 py-1 w-full';
+    inputEdit.className = 'border rounded px-2 py-1 w-full min-w-0';
+    inputEdit.maxLength = MAX_CHARS;
 
     const saveBtn = document.createElement('button');
     saveBtn.textContent = 'Salvar';
@@ -125,5 +131,17 @@ input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') addTaskFromInput();
 });
 
+// Atualiza o contador de caracteres
+function updateCharCount() {
+    const len = input.value.length;
+    if (charCount) charCount.textContent = len;
+}
+
+input.addEventListener('input', updateCharCount);
+
+// inicializa contador
+updateCharCount();
+
 // Optional: sample task to demonstrate UI
 // taskList.appendChild(createTaskElement('Exemplo: Estudar JavaScript'));
+
