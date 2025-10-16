@@ -1,9 +1,10 @@
 {
-  "tailwindCSS.includeLanguages": {
-    "html": "html",
-    "javascript": "javascript"
-  },
-  "editor.quickSuggestions": {
-    "strings": true
-  }
+    "tailwindCSS.includeLanguages": {
+        "html": "html",
+        "javascript": "javascript"
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "liveServer.settings.port": 5501
 }
