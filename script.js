@@ -56,7 +56,7 @@ function adicionarTarefa(evento) {
     const texto = campoNovaTarefa.value.trim(); // remove espaços extras
 
     if (texto === '') {
-        {mostrarModal('Atenção!', 'Por favor, digite o que precisa ser feito.'); return; }
+        { mostrarModal('Atenção!', 'Por favor, digite o que precisa ser feito.'); return; }
     }
 
     // Criamos um objeto representando a tarefa
@@ -258,11 +258,6 @@ formularioTarefa.addEventListener('submit', adicionarTarefa);
 campoPesquisa.addEventListener('input', aplicarFiltroEPesquisa);
 // O seletor de filtro agora chama a função combinada
 seletorFiltro.addEventListener('change', aplicarFiltroEPesquisa);
-
-
-// -------------------------------
-// 12. Não é necessário o "keydown" aqui, pois o submit do form já trata o Enter!
-// -------------------------------
 
 // -------------------------------
 // 13. Quando a página carregar, buscamos as tarefas salvas
