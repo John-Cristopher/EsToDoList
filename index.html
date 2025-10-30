@@ -1,40 +1,108 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EsToDoList</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remake Tarefas Minimalista (Tailwind)</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fundo-claro': '#F7F7F7', // Fundo principal
+                        'verde-sutil': '#C1DBC3', // Destaque/Borda (Sálvia Claro)
+                        'verde-musgo': '#4A6D55', // Texto/Contraste (Musgo Escuro)
+                        'azul-agua': '#B0E0E6', // Ação/Botão
+                        'concluido-bg': '#E3FBE3', // Fundo de tarefa concluída
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body>
-    <main class="flex justify-center items-center">
-        <div class="m-10 w-full max-w-2xl">
-            <div class="text-center mb-6">
-                <div class="flex flex-col gap-3 mg-5 bg-indigo-100 p-10 rounded-lg shadow-md">
-                    <h1 class="text-4xl font-bold text-indigo-600 mb-2">EsToDoList</h1>
-                    <h1 class="text-2xl font-semibold text-indigo-700">Alguma Novidade?</h1>
-                    <div class="flex flex-col md:flex-row md:items-center gap-3 w-full">
-                        <input type="text" placeholder="Digitar Tarefa..."
-                            class="border border-indigo-300 rounded-lg px-4 py-2 flex-1" id="add_task"
-                            aria-label="digitar tarefa" maxlength="240" />
-                        <button id="add_btn"
-                            class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors">
-                            Adicionar
-                        </button>
-                    </div>
-                    <div class="text-sm text-gray-500 mt-2">
-                        <span id="char_count">0</span> Caracteres
-                    </div>
+<body class="bg-fundo-claro min-h-screen flex justify-center pt-10 pb-10 sm:pt-20 text-verde-musgo">
+
+    <div id="main-container"
+        class="task-manager w-full max-w-4xl bg-container-pastel p-6 sm:p-10 rounded-xl shadow-xl border-t-4 border-verde-sutil">
+
+        <header id="header">
+            <h1 class="text-3xl sm:text-4xl text-center font-light mb-8 pb-4 border-b border-verde-sutil">
+                Lista de Tarefas
+            </h1>
+        </header>
+
+        <div id="task-form-container">
+            <form id="task-form"
+                class="task-form flex mb-8 sm:mb-10 rounded-lg overflow-hidden border-2 border-verde-sutil">
+                <input type="text" id="task-input" placeholder="O que precisa ser feito?" required
+                    class="flex-1 p-3 sm:p-4 text-lg border-none bg-transparent focus:outline-none placeholder-verde-musgo/70">
+                <button type="submit" id="add-btn"
+                    class="bg-azul-agua text-verde-musgo p-3 sm:p-4 text-xl transition duration-300 hover:bg-verde-sutil active:scale-95"
+                    title="Adicionar Tarefa">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+        </div>
+
+        <div id="search-filter-container" class="search-filter-container flex flex-col sm:flex-row gap-4 mb-8">
+            <input type="text" id="search-input" placeholder="Pesquisar tarefas..."
+                class="search-input grow p-3 border border-verde-sutil rounded-lg text-verde-musgo bg-white focus:ring-2 focus:ring-verde-sutil focus:border-verde-sutil transition duration-200">
+            <select id="filter-select"
+                class="filter-select w-full sm:w-1/4 p-3 border border-verde-sutil rounded-lg text-verde-musgo bg-white focus:ring-2 focus:ring-verde-sutil focus:border-verde-sutil cursor-pointer transition duration-200">
+                <option value="all">Todas</option>
+                <option value="done">Concluídas</option>
+                <option value="todo">A fazer</option>
+            </select>
+        </div>
+        <div id="task-list-container" class="space-y-4">
+
+            <div id="task-template"
+                class="task-item hidden justify-between items-center bg-white p-4 sm:p-5 rounded-lg shadow-md border-l-4 border-verde-sutil transition duration-300 hover:shadow-lg">
+                <span class="task-text text-lg sm:text-xl font-medium flex-1 mr-4"></span>
+                <div class="actions flex space-x-2 sm:space-x-3">
+                    <button class="edit-btn text-lg text-verde-musgo/80 hover:text-azul-agua transition" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="done-btn text-lg text-verde-sutil hover:text-verde-musgo transition"
+                        title="Marcar como Concluída">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="remove-btn text-lg text-red-400 hover:text-red-600 transition" title="Remover">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
             </div>
-            <ul id="task_list" class="mt-6 space-y-3">
-                <!-- tarefas serão inseridas aqui dinamicamente -->
-            </ul>
+
         </div>
-    </main>
-    <script src="script.js"></script>
+    </div>
+    <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden justify-center items-center">
+        <div
+            class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-sm border-t-4 border-verde-musgo animate-in fade-in zoom-in duration-300">
+            <h3 id="modal-title" class="text-xl font-bold mb-4 text-verde-musgo">Título do Modal</h3>
+            <p id="modal-message" class="mb-6 text-gray-700">Mensagem.</p>
+
+            <input type="text" id="modal-input"
+                class="hidden w-full p-2 mb-4 border border-verde-sutil rounded-lg focus:ring-2 focus:ring-azul-agua"
+                placeholder="Digite aqui...">
+
+            <div id="modal-actions" class="flex justify-end space-x-3">
+                <button id="modal-cancel-btn"
+                    class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">Cancelar</button>
+
+                <button id="modal-confirm-btn"
+                    class="px-4 py-2 text-sm text-white bg-azul-agua rounded-lg hover:bg-verde-musgo transition duration-150">Confirmar</button>
+            </div>
+        </div>
+    </div>
 </body>
+<script src="script.js"></script>
 
 </html>

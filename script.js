@@ -1,65 +1,329 @@
-// Versão simplificada do script para iniciantes
-// Esta versão só permite: adicionar tarefas e remover tarefas.
-// Comentários explicam o básico: const/let/var, funções e variáveis simples.
+// =============================================================
+//  Remake Tarefas Minimalista - CRUD básico de tarefas
+//  Adaptação do JS_MODELO para o MEU_HTML_INDIVIDUAL
+//  Foco em Clean Code, Padrões e Adaptação de Seletores
+// =============================================================
 
-// getElementById pega um elemento do HTML pelo seu id.
-// Ex: <input id="add_task"> no HTML. Aqui guardamos referência a esse elemento.
-const input = document.getElementById('add_task'); // onde o usuário digita
-const addBtn = document.getElementById('add_btn'); // botão para adicionar
-const taskList = document.getElementById('task_list'); // onde as tarefas aparecem
+// -------------------------------
+// 1. Selecionar os elementos da página
+//    (Seletores adaptados para o MEU_HTML_INDIVIDUAL)
+// -------------------------------
+const campoNovaTarefa = document.getElementById('task-input'); // Era 'nova-tarefa-input'
+const formularioTarefa = document.getElementById('task-form'); // Novo elemento: o formulário
+const listaTarefas = document.getElementById('task-list-container'); // Era 'lista-de-tarefas'
+const campoPesquisa = document.getElementById('search-input'); // Era 'pesquisa-input'
+const seletorFiltro = document.getElementById('filter-select'); // Era 'filtro-select'
+const modal = document.getElementById('custom-modal');
+const modalTitulo = document.getElementById('modal-title');
+const modalMensagem = document.getElementById('modal-message');
+const modalInput = document.getElementById('modal-input');
+const botaoCancelar = document.getElementById('modal-cancel-btn');
+const botaoConfirmar = document.getElementById('modal-confirm-btn');
 
-// Explicando palavras comuns:
-// const: cria uma variável que NÃO será reatribuída. Use quando o valor não muda.
-// let: cria uma variável que PODE ser reatribuída. Boa para contadores ou temporários.
-// var: forma antiga de declarar variável. Evite por enquanto.
+// Array principal que armazenará todas as tarefas
+let tarefas = [];
 
-// Função simples: cria um item de tarefa (li) com texto e botão de excluir.
-function createTask(text) {
-    // cria um elemento <li>
-    const li = document.createElement('li');
-    // coloca o texto dentro do <li>
-    li.textContent = text;
+// Nome da chave do localStorage adaptado para ser mais genérico, se necessário
+const STORAGE_KEY = 'minimalistTasks';
 
-    // cria um botão de excluir
-    const btn = document.createElement('button');
-    btn.textContent = 'Remover';
-    // quando clicar no botão, remove a tarefa (o pai do botão)
-    btn.addEventListener('click', function() {
-        // li é o pai do botão, removemos ele da lista
-        taskList.removeChild(li);
-    });
-
-    // adiciona o botão dentro do li (após o texto)
-    li.appendChild(document.createTextNode(' ')); // espaço antes do botão
-    li.appendChild(btn);
-
-    return li;
+// -------------------------------
+// 2. Carregar tarefas salvas no navegador (localStorage)
+// -------------------------------
+function carregarTarefasSalvas() {
+    const tarefasSalvas = localStorage.getItem(STORAGE_KEY);
+    if (tarefasSalvas) {
+        // Converte o texto JSON salvo em um array de objetos
+        tarefas = JSON.parse(tarefasSalvas);
+        exibirTarefas(tarefas);
+    }
 }
 
-// Função que pega o texto do input e adiciona a tarefa na lista
-function addTask() {
-    const text = input.value.trim(); // trim remove espaços no começo/fim
-    if (text === '') {
-        // não deixa adicionar tarefas vazias
-        alert('Digite algo antes de adicionar uma tarefa.');
-        return;
+// -------------------------------
+// 3. Salvar as tarefas no navegador
+// -------------------------------
+function salvarTarefas() {
+    // Converte o array de objetos em uma string JSON para salvar
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tarefas));
+}
+
+// -------------------------------
+// 4. Função para adicionar uma nova tarefa (Chamada pelo submit do formulário)
+// -------------------------------
+function adicionarTarefa(evento) {
+    // Impede o recarregamento da página que é o comportamento padrão do submit de um formulário
+    evento.preventDefault();
+
+    const texto = campoNovaTarefa.value.trim(); // remove espaços extras
+
+    if (texto === '') {
+        {mostrarModal('Atenção!', 'Por favor, digite o que precisa ser feito.'); return; }
     }
 
-    const task = createTask(text);
-    taskList.appendChild(task);
-    input.value = ''; // limpa o campo
-    input.focus(); // coloca cursor de volta no input
+    // Criamos um objeto representando a tarefa
+    const novaTarefa = {
+        id: Date.now(), // cria um número único com base no tempo atual
+        texto: texto,
+        concluida: false
+    };
+
+    // Adicionamos ao array e salvamos
+    tarefas.push(novaTarefa);
+    salvarTarefas();
+
+    // Atualizamos a lista exibida
+    exibirTarefas(tarefas);
+
+    // Limpamos o campo de texto
+    campoNovaTarefa.value = '';
 }
 
-// ligar o botão e a tecla Enter ao adicionar
-addBtn.addEventListener('click', addTask);
-input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') addTask();
-});
+// -------------------------------
+// 5. Função para exibir as tarefas na tela
+//    (Adaptação do HTML/Classes Tailwind)
+// -------------------------------
+function exibirTarefas(listaParaMostrar) {
+    // Limpamos a lista antes de mostrar novamente, garantindo que o template não seja removido
+    // Usamos querySelectorAll e filter para limpar apenas os itens de tarefa, mantendo o template
+    listaTarefas.querySelectorAll('.task-item:not(#task-template)').forEach(item => item.remove());
 
-// Pronto! Este script é intencionalmente curto e fácil de ler.
-// Coisas a explorar depois (quando estiver confortável):
-// - editar tarefas
-// - salvar tarefas no navegador (localStorage)
-// - marcar como concluída
+    // Percorremos todas as tarefas do array
+    for (let tarefa of listaParaMostrar) {
+        // Clona o template do HTML para criar um novo item de tarefa
+        const item = document.getElementById('task-template').cloneNode(true);
+        item.id = `task-${tarefa.id}`; // Define um ID único
+        item.classList.remove('hidden'); // Torna o item visível
+        item.classList.add('task-item-active'); // Adiciona uma classe para identificar o item ativo
 
+        // Adicionamos classes de estilo de conclusão, se for o caso
+        if (tarefa.concluida) {
+            // Adiciona a classe de fundo concluído e remove a borda normal
+            item.classList.add('bg-concluido-bg', 'border-verde-musgo');
+            item.classList.remove('bg-white', 'border-verde-sutil');
+
+            // Encontra o span do texto
+            const textoTarefa = item.querySelector('.task-text');
+            // Adiciona o traço no texto
+            textoTarefa.classList.add('line-through', 'text-verde-musgo/60', 'italic');
+
+            // Encontra o botão de check e ajusta o título para desmarcar
+            const doneBtn = item.querySelector('.done-btn');
+            doneBtn.title = 'Marcar como Não Concluída';
+            doneBtn.querySelector('i').classList.remove('fa-check');
+            doneBtn.querySelector('i').classList.add('fa-undo'); // Icone para desfazer
+        } else {
+            // Remove o traço no texto
+            const textoTarefa = item.querySelector('.task-text');
+            textoTarefa.classList.remove('line-through', 'text-verde-musgo/60', 'italic');
+        }
+
+        // Configura o texto
+        const textoTarefa = item.querySelector('.task-text');
+        textoTarefa.textContent = tarefa.texto;
+
+        // Configura os eventos dos botões, usando querySelector
+        item.querySelector('.edit-btn').onclick = function () {
+            editarTarefa(tarefa.id);
+        };
+
+        // O botão 'done-btn' agora lida com a alternância
+        item.querySelector('.done-btn').onclick = function () {
+            alternarConclusao(tarefa.id);
+        };
+
+        item.querySelector('.remove-btn').onclick = function () {
+            excluirTarefa(tarefa.id);
+        };
+
+        // Adicionamos o novo item à lista
+        listaTarefas.appendChild(item);
+    }
+}
+
+// -------------------------------
+// 6. Função para alternar entre concluída e ativa (done/todo)
+// -------------------------------
+function alternarConclusao(id) {
+    // Percorre o array e inverte o status de 'concluida'
+    for (let tarefa of tarefas) {
+        if (tarefa.id === id) {
+            tarefa.concluida = !tarefa.concluida;
+            break; // Sai do loop após encontrar a tarefa
+        }
+    }
+    salvarTarefas();
+    // Chamamos a pesquisa/filtro novamente para que o item suma da tela se o filtro 'done' ou 'todo' estiver ativo
+    aplicarFiltroEPesquisa();
+}
+
+// -------------------------------
+// 7. Função para editar o texto de uma tarefa
+// -------------------------------
+function editarTarefa(id) {
+    // Busca a tarefa atual para pré-preencher o prompt
+    const tarefaAtual = tarefas.find(t => t.id === id);
+    if (!tarefaAtual) return;
+
+    const novaDescricao = mostrarModal(
+        'Editar Tarefa',
+        'Modifique o texto da tarefa abaixo:',
+        true, // Usa Input (true)
+        tarefaAtual.texto // Valor Inicial
+    );
+
+    if (novaDescricao === null || novaDescricao.trim() === '') {
+        return; // se cancelar ou deixar em branco, não faz nada
+    }
+
+    // Atualiza o texto da tarefa
+    tarefaAtual.texto = novaDescricao.trim();
+
+    salvarTarefas();
+    // Não precisa de exibirTarefas(tarefas), pois a pesquisa/filtro faz isso
+    aplicarFiltroEPesquisa();
+}
+
+// -------------------------------
+// 8. Função para excluir uma tarefa
+// -------------------------------
+function excluirTarefa(id) {
+    const confirmar = mostrarModal(
+        'Confirmação Necessária',
+        'Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.',
+        false // Não usa Input (false)
+    );
+
+    if (confirmar) {
+        // Filtra o array, mantendo apenas as tarefas que NÃO têm o ID fornecido
+        tarefas = tarefas.filter(function (tarefa) {
+            return tarefa.id !== id;
+        });
+        salvarTarefas();
+        // Chamamos a pesquisa/filtro novamente para atualizar a lista
+        aplicarFiltroEPesquisa();
+    }
+}
+
+// -------------------------------
+// 9. Função de pesquisa
+// -------------------------------
+function pesquisarTarefas(lista) {
+    const termo = campoPesquisa.value.toLowerCase();
+
+    // Filtra a lista recebida (que já pode estar filtrada pelo status)
+    return lista.filter(function (tarefa) {
+        return tarefa.texto.toLowerCase().includes(termo);
+    });
+}
+
+// -------------------------------
+// 10. Filtro: todos / done / todo (concluídos / a fazer)
+// -------------------------------
+function filtrarTarefas() {
+    const tipo = seletorFiltro.value;
+    let filtradas = tarefas; // Começa com todas as tarefas
+
+    if (tipo === 'done') {
+        // Filtra apenas as concluídas
+        filtradas = tarefas.filter(tarefa => tarefa.concluida);
+    } else if (tipo === 'todo') {
+        // Filtra apenas as não concluídas (a fazer)
+        filtradas = tarefas.filter(tarefa => !tarefa.concluida);
+    }
+
+    // Retorna a lista filtrada pelo status
+    return filtradas;
+}
+
+// -------------------------------
+// 10.1. Função para combinar pesquisa e filtro
+// -------------------------------
+function aplicarFiltroEPesquisa() {
+    // 1. Aplica o filtro de status (todo/done/all)
+    let listaFiltrada = filtrarTarefas();
+
+    // 2. Aplica a pesquisa (termo de busca)
+    listaFiltrada = pesquisarTarefas(listaFiltrada);
+
+    // 3. Exibe o resultado final
+    exibirTarefas(listaFiltrada);
+}
+
+
+// -------------------------------
+// 11. Eventos (interações do usuário)
+// -------------------------------
+// O evento é no SUBMIT do formulário, não no clique do botão
+formularioTarefa.addEventListener('submit', adicionarTarefa);
+// O campo de pesquisa agora chama a função combinada
+campoPesquisa.addEventListener('input', aplicarFiltroEPesquisa);
+// O seletor de filtro agora chama a função combinada
+seletorFiltro.addEventListener('change', aplicarFiltroEPesquisa);
+
+
+// -------------------------------
+// 12. Não é necessário o "keydown" aqui, pois o submit do form já trata o Enter!
+// -------------------------------
+
+// -------------------------------
+// 13. Quando a página carregar, buscamos as tarefas salvas
+// -------------------------------
+window.onload = carregarTarefasSalvas;
+
+// -------------------------------
+// 14. Função de Abstração para Modais (Substitui alert/prompt/confirm)
+// -------------------------------
+
+/**
+ * Exibe o modal customizado para diferentes tipos de interação.
+ * @param {string} titulo - Título do modal.
+ * @param {string} mensagem - Mensagem ou instrução.
+ * @param {boolean} [usaInput=false] - Se deve mostrar o campo de input (para editar).
+ * @param {string} [valorInicial=''] - Valor inicial do campo de input.
+ * @returns {Promise<string|boolean>} - Retorna o texto do input (se for prompt) ou true/false (se for confirm).
+ */
+function mostrarModal(titulo, mensagem, usaInput = false, valorInicial = '') {
+    return new Promise((resolve) => {
+        // 1. Configurações visuais
+        modalTitulo.textContent = titulo;
+        modalMensagem.textContent = mensagem;
+
+        // 2. Lógica do Input (para prompts de edição)
+        if (usaInput) {
+            modalInput.classList.remove('hidden');
+            modalInput.value = valorInicial;
+            modalInput.focus(); // Foca no campo para digitação imediata
+            modalMensagem.classList.add('hidden'); // Esconde a mensagem em caso de input
+        } else {
+            modalInput.classList.add('hidden');
+            modalMensagem.classList.remove('hidden');
+        }
+
+        // 3. Reseta e Exibe o Modal
+        // Clonamos para remover todos os event listeners anteriores e evitar duplicação
+        const novoBotaoConfirmar = botaoConfirmar.cloneNode(true);
+        botaoConfirmar.parentNode.replaceChild(novoBotaoConfirmar, botaoConfirmar);
+
+        const novoBotaoCancelar = botaoCancelar.cloneNode(true);
+        botaoCancelar.parentNode.replaceChild(novoBotaoCancelar, botaoCancelar);
+
+        // Exibe a div principal
+        modal.classList.remove('hidden');
+        modal.classList.add('flex'); // Volta a ser flex para centralizar
+
+        // 4. Configuração dos Eventos (Promise)
+
+        // Resolve com o valor do input (ou true para confirmação)
+        novoBotaoConfirmar.onclick = function () {
+            modal.classList.add('hidden');
+            // Se usou input (prompt), retorna o texto, senão retorna true (confirm)
+            resolve(usaInput ? modalInput.value : true);
+        };
+
+        // Resolve com null (se for prompt) ou false (se for confirm)
+        novoBotaoCancelar.onclick = function () {
+            modal.classList.add('hidden');
+            // Retorna null para cancelar o prompt, ou false para cancelar o confirm
+            resolve(usaInput ? null : false);
+        };
+    });
+}
