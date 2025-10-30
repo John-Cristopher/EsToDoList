@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remake Tarefas Minimalista (Tailwind)</title>
+    <title>EsToDoList</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -34,7 +34,7 @@
         class="task-manager w-full max-w-4xl bg-container-pastel p-6 sm:p-10 rounded-xl shadow-xl border-t-4 border-verde-sutil">
 
         <header id="header">
-            <h1 class="text-3xl sm:text-4xl text-center font-light mb-8 pb-4 border-b border-verde-sutil">
+            <h1 class="text-4xl sm:text-7xl text-center font-light mb-8 pb-4 border-b border-verde-sutil">
                 Lista de Tarefas
             </h1>
         </header>
@@ -43,9 +43,9 @@
             <form id="task-form"
                 class="task-form flex mb-8 sm:mb-10 rounded-lg overflow-hidden border-2 border-verde-sutil">
                 <input type="text" id="task-input" placeholder="O que precisa ser feito?" required
-                    class="flex-1 p-3 sm:p-4 text-lg border-none bg-transparent focus:outline-none placeholder-verde-musgo/70">
+                    class="flex-1 p-3 sm:p-4 text-2xl border-none bg-transparent focus:outline-none placeholder-verde-musgo/70">
                 <button type="submit" id="add-btn"
-                    class="bg-azul-agua text-verde-musgo p-3 sm:p-4 text-xl transition duration-300 hover:bg-verde-sutil active:scale-95"
+                    class="bg-azul-agua text-verde-musgo p-3 sm:p-4 text-2xl transition duration-300 hover:bg-verde-sutil active:scale-95"
                     title="Adicionar Tarefa">
                     <i class="fas fa-plus"></i>
                 </button>
@@ -54,9 +54,10 @@
 
         <div id="search-filter-container" class="search-filter-container flex flex-col sm:flex-row gap-4 mb-8">
             <input type="text" id="search-input" placeholder="Pesquisar tarefas..."
-                class="search-input grow p-3 border border-verde-sutil rounded-lg text-verde-musgo bg-white focus:ring-2 focus:ring-verde-sutil focus:border-verde-sutil transition duration-200">
+                class="search-input grow p-3 border border-verde-sutil rounded-lg text-verde-musgo bg-white focus:ring-2 focus:ring-verde-sutil focus:border-verde-sutil transition
+                text-2xl duration-200">
             <select id="filter-select"
-                class="filter-select w-full sm:w-1/4 p-3 border border-verde-sutil rounded-lg text-verde-musgo bg-white focus:ring-2 focus:ring-verde-sutil focus:border-verde-sutil cursor-pointer transition duration-200">
+                class="filter-select w-full sm:w-1/4 p-4 border border-verde-sutil rounded-lg text-verde-musgo bg-white focus:ring-2 text-2xl focus:ring-verde-sutil focus:border-verde-sutil cursor-pointer transition duration-200">
                 <option value="all">Todas</option>
                 <option value="done">Concluídas</option>
                 <option value="todo">A fazer</option>
@@ -66,16 +67,16 @@
 
             <div id="task-template"
                 class="task-item hidden justify-between items-center bg-white p-4 sm:p-5 rounded-lg shadow-md border-l-4 border-verde-sutil transition duration-300 hover:shadow-lg">
-                <span class="task-text text-lg sm:text-xl font-medium flex-1 mr-4"></span>
+                <span class="task-text text-4xl sm:text-xl font-medium flex-1 mr-4"></span>
                 <div class="actions flex space-x-2 sm:space-x-3">
-                    <button class="edit-btn text-4xl text-verde-musgo/80 hover:text-azul-agua transition" title="Editar">
+                    <button class="edit-btn text-3xl text-verde-musgo/80 hover:text-azul-agua transition" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="done-btn text-4xl text-verde-sutil hover:text-verde-musgo transition"
+                    <button class="done-btn text-3xl text-verde-sutil hover:text-verde-musgo transition"
                         title="Marcar como Concluída">
                         <i class="fas fa-check"></i>
                     </button>
-                    <button class="remove-btn text-4xl text-red-400 hover:text-red-600 transition" title="Remover">
+                    <button class="remove-btn text-3xl text-red-400 hover:text-red-600 transition" title="Remover">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
