@@ -50,14 +50,14 @@ function salvarTarefas() {
 // -------------------------------
 // 4. Função para adicionar uma nova tarefa (Chamada pelo submit do formulário)
 // -------------------------------
-function adicionarTarefa(evento) {
+async function adicionarTarefa(evento) {
     // Impede o recarregamento da página que é o comportamento padrão do submit de um formulário
     evento.preventDefault();
 
     const texto = campoNovaTarefa.value.trim(); // remove espaços extras
 
     if (texto === '') {
-        { mostrarModal('Atenção!', 'Por favor, digite o que precisa ser feito.'); return; }
+        { await mostrarModal('Atenção!', 'Por favor, digite o que precisa ser feito.'); return; }
     }
 
     // Criamos um objeto representando a tarefa
@@ -159,12 +159,12 @@ function alternarConclusao(id) {
 // -------------------------------
 // 7. Função para editar o texto de uma tarefa
 // -------------------------------
-function editarTarefa(id) {
+async function editarTarefa(id) {
     // Busca a tarefa atual para pré-preencher o prompt
     const tarefaAtual = tarefas.find(t => t.id === id);
     if (!tarefaAtual) return;
 
-    const novaDescricao = mostrarModal(
+    const novaDescricao = await mostrarModal(
         'Editar Tarefa',
         'Modifique o texto da tarefa abaixo:',
         true, // Usa Input (true)
@@ -186,8 +186,8 @@ function editarTarefa(id) {
 // -------------------------------
 // 8. Função para excluir uma tarefa
 // -------------------------------
-function excluirTarefa(id) {
-    const confirmar = mostrarModal(
+async function excluirTarefa(id) {
+    const confirmar = await mostrarModal(
         'Confirmação Necessária',
         'Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.',
         false // Não usa Input (false)
@@ -263,9 +263,11 @@ seletorFiltro.addEventListener('change', aplicarFiltroEPesquisa);
 // -------------------------------
 // 13. Quando a página carregar, buscamos as tarefas salvas
 // -------------------------------
-window.onload = carregarTarefasSalvas;
+window.onload = function () {
     carregarTarefasSalvas();
     configurarListenersModal();
+}
+
 
 // -------------------------------
 // 14. Função de Abstração para Modais (Substitui alert/prompt/confirm)
@@ -342,9 +344,9 @@ function configurarListenersModal() {
         modal.classList.add('hidden');
         // Verifica se o modal estava em modo input (prompt) ou confirmação (confirm)
         const usaInput = !modalInput.classList.contains('hidden');
-        
+
         // Resolve com o valor do input (ou true para confirmação)
-        modalResolver(usaInput ? modalInput.value : true); 
+        modalResolver(usaInput ? modalInput.value : true);
         modalResolver = null; // Limpa o resolver para a próxima Promise
     });
 
@@ -354,9 +356,9 @@ function configurarListenersModal() {
 
         modal.classList.add('hidden');
         const usaInput = !modalInput.classList.contains('hidden');
-        
+
         // Resolve com null (se for prompt) ou false (se for confirm)
-        modalResolver(usaInput ? null : false); 
+        modalResolver(usaInput ? null : false);
         modalResolver = null; // Limpa o resolver
     });
 }
@@ -387,9 +389,9 @@ function mostrarModal(titulo, mensagem, usaInput = false, valorInicial = '') {
             modalInput.classList.add('hidden');
             modalMensagem.classList.remove('hidden');
         }
-        
+
         // 3. Exibe o Modal (sem a necessidade de clonagem)
         modal.classList.remove('hidden');
-        modal.classList.add('flex'); 
+        modal.classList.add('flex');
     });
 }
