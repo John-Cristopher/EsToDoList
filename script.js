@@ -22,6 +22,7 @@ const botaoConfirmar = document.getElementById('modal-confirm-btn');
 
 // Array principal que armazenará todas as tarefas
 let tarefas = [];
+let modalResolver;
 
 // Nome da chave do localStorage adaptado para ser mais genérico, se necessário
 const STORAGE_KEY = 'minimalistTasks';
@@ -263,6 +264,8 @@ seletorFiltro.addEventListener('change', aplicarFiltroEPesquisa);
 // 13. Quando a página carregar, buscamos as tarefas salvas
 // -------------------------------
 window.onload = carregarTarefasSalvas;
+    carregarTarefasSalvas();
+    configurarListenersModal();
 
 // -------------------------------
 // 14. Função de Abstração para Modais (Substitui alert/prompt/confirm)
@@ -320,5 +323,73 @@ function mostrarModal(titulo, mensagem, usaInput = false, valorInicial = '') {
             // Retorna null para cancelar o prompt, ou false para cancelar o confirm
             resolve(usaInput ? null : false);
         };
+    });
+}
+
+// -------------------------------
+// 14.1. Configuração Única dos Listeners do Modal
+// -------------------------------
+
+/**
+ * Anexa os ouvintes de evento permanentes aos botões do modal.
+ * Esta função é chamada apenas uma vez, na inicialização.
+ */
+function configurarListenersModal() {
+    // Listener do Botão Confirmar/OK
+    botaoConfirmar.addEventListener('click', () => {
+        if (!modalResolver) return; // Se não houver Promise ativa, ignora
+
+        modal.classList.add('hidden');
+        // Verifica se o modal estava em modo input (prompt) ou confirmação (confirm)
+        const usaInput = !modalInput.classList.contains('hidden');
+        
+        // Resolve com o valor do input (ou true para confirmação)
+        modalResolver(usaInput ? modalInput.value : true); 
+        modalResolver = null; // Limpa o resolver para a próxima Promise
+    });
+
+    // Listener do Botão Cancelar/Fechar
+    botaoCancelar.addEventListener('click', () => {
+        if (!modalResolver) return; // Se não houver Promise ativa, ignora
+
+        modal.classList.add('hidden');
+        const usaInput = !modalInput.classList.contains('hidden');
+        
+        // Resolve com null (se for prompt) ou false (se for confirm)
+        modalResolver(usaInput ? null : false); 
+        modalResolver = null; // Limpa o resolver
+    });
+}
+
+// -------------------------------
+// 14.2. Função de Abstração para Modais (Simplificada)
+// -------------------------------
+
+/**
+ * Exibe o modal customizado.
+ * @returns {Promise<string|boolean>}
+ */
+function mostrarModal(titulo, mensagem, usaInput = false, valorInicial = '') {
+    return new Promise((resolve) => {
+        modalResolver = resolve; // <--- Armazena a função resolve para ser chamada pelos listeners
+
+        // 1. Configurações visuais
+        modalTitulo.textContent = titulo;
+        modalMensagem.textContent = mensagem;
+
+        // 2. Lógica do Input (para prompts de edição)
+        if (usaInput) {
+            modalInput.classList.remove('hidden');
+            modalMensagem.classList.add('hidden'); // Esconde a mensagem em caso de input
+            modalInput.value = valorInicial;
+            modalInput.focus();
+        } else {
+            modalInput.classList.add('hidden');
+            modalMensagem.classList.remove('hidden');
+        }
+        
+        // 3. Exibe o Modal (sem a necessidade de clonagem)
+        modal.classList.remove('hidden');
+        modal.classList.add('flex'); 
     });
 }
