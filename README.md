@@ -38,5 +38,5 @@ Com um visual limpo e moderno, o aplicativo oferece funcionalidades completas pa
 
 1. **Clone o repositório**
     ```bash
-    git clone https://github.com/seu-usuario/EsToDoList.git
+    git clone https://github.com/John-Cristopher/EsToDoList.git
     ```
