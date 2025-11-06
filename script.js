@@ -24,7 +24,7 @@ const botaoConfirmar = document.getElementById('modal-confirm-btn');
 let tarefas = [];
 let modalResolver;
 
-// Nome da chave do localStorage adaptado para ser mais genérico, se necessário
+// Nome da chave do localStorage adaptado
 const STORAGE_KEY = 'minimalistTasks';
 
 // -------------------------------
@@ -48,7 +48,7 @@ function salvarTarefas() {
 }
 
 // -------------------------------
-// 4. Função para adicionar uma nova tarefa (Chamada pelo submit do formulário)
+// 4. Função para adicionar uma nova tarefa
 // -------------------------------
 async function adicionarTarefa(evento) {
     // Impede o recarregamento da página que é o comportamento padrão do submit de um formulário
@@ -60,21 +60,21 @@ async function adicionarTarefa(evento) {
         { await mostrarModal('Atenção!', 'Por favor, digite o que precisa ser feito.'); return; }
     }
 
-    // Criamos um objeto representando a tarefa
+    // Objeto representando a tarefa
     const novaTarefa = {
-        id: Date.now(), // cria um número único com base no tempo atual
+        id: Date.now(), // Cria um número único com base no tempo atual
         texto: texto,
         concluida: false
     };
 
-    // Adicionamos ao array e salvamos
+    // Adiciona ao array e salvamos
     tarefas.push(novaTarefa);
     salvarTarefas();
 
-    // Atualizamos a lista exibida
+    // Atualiza a lista exibida
     exibirTarefas(tarefas);
 
-    // Limpamos o campo de texto
+    // Limpa o campo de texto
     campoNovaTarefa.value = '';
 }
 
@@ -83,11 +83,11 @@ async function adicionarTarefa(evento) {
 //    (Adaptação do HTML/Classes Tailwind)
 // -------------------------------
 function exibirTarefas(listaParaMostrar) {
-    // Limpamos a lista antes de mostrar novamente, garantindo que o template não seja removido
-    // Usamos querySelectorAll e filter para limpar apenas os itens de tarefa, mantendo o template
+    // Limpam a lista antes de mostrar novamente, garantindo que o template não seja removido
+    // Usa querySelectorAll e filter para limpar apenas os itens de tarefa, mantendo o template
     listaTarefas.querySelectorAll('.task-item:not(#task-template)').forEach(item => item.remove());
 
-    // Percorremos todas as tarefas do array
+    // Percorre todas as tarefas do array
     for (let tarefa of listaParaMostrar) {
         // Clona o template do HTML para criar um novo item de tarefa
         const item = document.getElementById('task-template').cloneNode(true);
@@ -95,7 +95,7 @@ function exibirTarefas(listaParaMostrar) {
         item.classList.remove('hidden'); // Torna o item visível
         item.classList.add('task-item-active'); // Adiciona uma classe para identificar o item ativo
 
-        // Adicionamos classes de estilo de conclusão, se for o caso
+        // Adicion classes de estilo de conclusão, se for o caso
         if (tarefa.concluida) {
             // Adiciona a classe de fundo concluído e remove a borda normal
             item.classList.add('bg-concluido-bg', 'border-verde-musgo');
@@ -135,7 +135,7 @@ function exibirTarefas(listaParaMostrar) {
             excluirTarefa(tarefa.id);
         };
 
-        // Adicionamos o novo item à lista
+        // Adiciona o novo item à lista
         listaTarefas.appendChild(item);
     }
 }
@@ -152,7 +152,7 @@ function alternarConclusao(id) {
         }
     }
     salvarTarefas();
-    // Chamamos a pesquisa/filtro novamente para que o item suma da tela se o filtro 'done' ou 'todo' estiver ativo
+    // Chama a pesquisa/filtro novamente para que o item suma da tela se o filtro 'done' ou 'todo' estiver ativo
     aplicarFiltroEPesquisa();
 }
 
@@ -199,7 +199,7 @@ async function excluirTarefa(id) {
             return tarefa.id !== id;
         });
         salvarTarefas();
-        // Chamamos a pesquisa/filtro novamente para atualizar a lista
+        // Chama a pesquisa/filtro novamente para atualizar a lista
         aplicarFiltroEPesquisa();
     }
 }
@@ -299,7 +299,7 @@ function mostrarModal(titulo, mensagem, usaInput = false, valorInicial = '') {
         }
 
         // 3. Reseta e Exibe o Modal
-        // Clonamos para remover todos os event listeners anteriores e evitar duplicação
+        // Clona para remover todos os event listeners anteriores e evitar duplicação
         const novoBotaoConfirmar = botaoConfirmar.cloneNode(true);
         botaoConfirmar.parentNode.replaceChild(novoBotaoConfirmar, botaoConfirmar);
 
